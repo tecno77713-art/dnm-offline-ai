@@ -1,0 +1,19 @@
+{
+  "name": "D:N:M · IA sin conexión",
+  "short_name": "D:N:M",
+  "description": "Chat local sin conexión y preguntas en línea sobre imágenes y documentos.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f4ef",
+  "theme_color": "#f5f4ef",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

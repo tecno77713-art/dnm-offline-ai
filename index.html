@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f5f4ef" />
     <meta
       name="description"
-      content="Chat de inteligencia artificial local; analiza imágenes y PDF con Gemini al enviar."
+      content="Chat privado D:N:M: conversa y analiza fotos localmente, sin enviar tus datos a internet."
     />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
@@ -19,7 +19,7 @@
           <span class="brand-mark" aria-hidden="true">D</span>
           <span>D:N:M</span>
         </a>
-        <span class="privacy-label"><span class="privacy-dot"></span> Texto local · archivos online al enviar</span>
+        <span class="privacy-label"><span class="privacy-dot"></span> Chat y fotos en tu teléfono</span>
       </header>
 
       <main class="main">
@@ -27,7 +27,7 @@
           <div class="eyebrow"><span class="sparkle">✳</span> TU ESPACIO, TU IA</div>
           <h1 id="title">Hola.<br />Estoy aquí <span>para ti.</span></h1>
           <p class="intro-copy">
-            Texto procesado en el teléfono; imágenes y PDF, con Gemini cuando los envías.
+            Tu propia IA D:N:M: conversa contigo y entiende tus fotos en tu teléfono.
           </p>
           <a
             class="app-download-button"
@@ -38,7 +38,7 @@
             </svg>
             Descargar aplicación para Android
           </a>
-          <p class="app-download-note">Un solo APK. La IA se descarga al abrirla y Android busca actualizaciones a diario; activa las notificaciones.</p>
+          <p class="app-download-note">Un solo APK. La primera vez descarga la IA (unos 5,1 GB); Android comprueba actualizaciones a diario.</p>
         </section>
 
         <section class="setup-card" aria-label="Estado de la inteligencia artificial">
@@ -47,42 +47,15 @@
             <div class="setup-copy">
               <strong id="status-title">Tu IA necesita prepararse</strong>
               <p id="status-detail">
-                Descarga la IA pequeña una vez para conversar sin conexión. Las imágenes y los PDF se analizan por internet.
+                Descarga una vez el modelo local para chatear y preguntar sobre fotos sin conexión.
               </p>
             </div>
           </div>
           <progress id="download-progress" max="100" value="0" hidden></progress>
           <div class="setup-bottom">
-            <span id="download-status">El modelo de texto ocupa unos 700 MB.</span>
+            <span id="download-status">Descarga: unos 5,1 GB. Necesita un teléfono compatible.</span>
             <button id="setup-button" class="primary-button" type="button">Preparar mi IA</button>
           </div>
-        </section>
-
-        <section class="cloud-card" aria-label="Configurar preguntas sobre imágenes y PDF">
-          <div class="cloud-heading">
-            <div class="cloud-icon" aria-hidden="true">↗</div>
-            <div>
-              <strong>Pregúntame sobre fotos y PDF</strong>
-              <p>Al enviar fotos o PDF y preguntar sobre ellos, se envían a Google. El chat de texto independiente sigue siendo local. Hasta 4 archivos y 15 MB por envío.</p>
-            </div>
-          </div>
-          <div class="cloud-setup">
-            <label class="visually-hidden" for="gemini-api-key">Clave de Google Gemini</label>
-            <input
-              id="gemini-api-key"
-              type="password"
-              autocomplete="off"
-              placeholder="Pega tu clave de Gemini"
-              aria-describedby="key-help key-status"
-            />
-            <button id="connect-gemini" class="secondary-button" type="button">Conectar</button>
-            <button id="clear-gemini" class="clear-key-button" type="button" hidden>Desconectar</button>
-          </div>
-          <div class="cloud-footer">
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Obtener una clave de Google</a>
-            <span id="key-status" role="status">Necesitas tu propia clave de Gemini.</span>
-          </div>
-          <p id="key-help" class="cloud-disclosure">La clave se guarda en esta pestaña. Google recibe los archivos que envías y las preguntas de seguimiento de esa conversación.</p>
         </section>
 
         <section class="chat-card" aria-label="Chat con D:N:M">
@@ -95,17 +68,32 @@
           </div>
           <div id="attachment-list" class="attachment-list" aria-live="polite" hidden></div>
           <form id="chat-form" class="composer">
-            <label class="visually-hidden" for="file-input">Adjuntar una imagen o PDF</label>
+            <label class="visually-hidden" for="file-input">Elegir una foto</label>
             <input
               id="file-input"
               class="visually-hidden"
               type="file"
-              accept="image/*,.pdf,application/pdf"
-              multiple
+              accept="image/*"
             />
-            <button id="attach-button" class="attach-button" type="button" aria-label="Adjuntar imagen o PDF" title="Adjuntar imagen o PDF">
+            <label class="visually-hidden" for="camera-input">Hacer una foto</label>
+            <input
+              id="camera-input"
+              class="visually-hidden"
+              type="file"
+              accept="image/*"
+              capture="environment"
+            />
+            <button id="camera-button" class="attach-button" type="button" aria-label="Hacer una foto" title="Hacer una foto">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.5 11.5 12 20a5 5 0 0 1-7.1-7.1l8.8-8.8a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-2.8-2.8l8.5-8.5" />
+                <path d="M4 7h3l1.5-2h7L17 7h3v12H4z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+            </button>
+            <button id="attach-button" class="attach-button" type="button" aria-label="Elegir una foto" title="Elegir una foto">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <circle cx="8.5" cy="9" r="1.5" />
+                <path d="m21 15-5-5L5 20" />
               </svg>
             </button>
             <label class="visually-hidden" for="message-input">Escribe un mensaje</label>
@@ -118,18 +106,24 @@
               enterkeyhint="send"
               disabled
             ></textarea>
+            <button id="voice-button" class="attach-button voice-button" type="button" aria-label="Dictar mensaje" title="Dictar sin conexión" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="9" y="3" width="6" height="12" rx="3" />
+                <path d="M5 11a7 7 0 0 0 14 0m-7 7v3m-4 0h8" />
+              </svg>
+            </button>
             <button id="send-button" class="send-button" type="submit" aria-label="Enviar mensaje" disabled>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 19V5m-7 7 7-7 7 7" />
               </svg>
             </button>
           </form>
-          <p class="chat-note">Al enviar fotos o PDF, Google Gemini procesa esos archivos y sus preguntas de seguimiento.</p>
+          <p class="chat-note">Tus mensajes y fotos se procesan en el teléfono. El dictado sin conexión está disponible en la app Android si tu teléfono tiene instalado el reconocimiento de voz en español.</p>
         </section>
 
         <footer class="footer-note">
           <span class="lock-icon" aria-hidden="true">⌑</span>
-          <span>El texto se queda en tu teléfono. No necesitas una cuenta para chatear.</span>
+          <span>Tus mensajes y fotos se quedan en tu teléfono. El modelo se descarga una vez.</span>
         </footer>
       </main>
     </div>

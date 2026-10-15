@@ -14,10 +14,15 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
+import android.os.Build;
 
 public class MainActivity extends Activity {
     private static final String HOME_URL = "https://tecno77713-art.github.io/dnm-offline-ai/?androidApp=1";
     private static final int FILE_CHOOSER_REQUEST = 1;
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 2;
 
     private WebView webView;
     private ProgressBar progressBar;
@@ -27,6 +32,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UpdateCheckWorker.schedule(this);
 
         android.widget.FrameLayout root = new android.widget.FrameLayout(this);
         webView = new WebView(this);
@@ -135,6 +141,20 @@ public class MainActivity extends Activity {
         });
 
         webView.loadUrl(HOME_URL);
+        requestNotificationPermission();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS")
+                == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{"android.permission.POST_NOTIFICATIONS"},
+                NOTIFICATION_PERMISSION_REQUEST
+        );
     }
 
     @Override

@@ -441,6 +441,17 @@ window.addEventListener("online", () => setChatEnabled(Boolean(engine)));
 window.addEventListener("offline", () => setChatEnabled(Boolean(engine)));
 updateGeminiStatus();
 
+if (new URLSearchParams(window.location.search).get("androidApp") === "1") {
+  if (navigator.onLine) {
+    prepareModel();
+  } else {
+    setStatus(
+      "Conéctate a internet para preparar la IA",
+      "La aplicación descargará la IA automáticamente cuando tengas conexión."
+    );
+  }
+}
+
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch((error) => {

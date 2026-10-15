@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    private static final String HOME_URL = "https://tecno77713-art.github.io/dnm-offline-ai/";
+    private static final String HOME_URL = "https://tecno77713-art.github.io/dnm-offline-ai/?androidApp=1";
     private static final int FILE_CHOOSER_REQUEST = 1;
 
     private WebView webView;

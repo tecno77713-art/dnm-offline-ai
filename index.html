@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f5f4ef" />
     <meta
       name="description"
-      content="Chat privado D:N:M: conversa y analiza fotos localmente, sin enviar tus datos a internet."
+      content="Chat privado D:N:M con inteligencia artificial local, ligero y sin conexión."
     />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
@@ -19,7 +19,7 @@
           <span class="brand-mark" aria-hidden="true">D</span>
           <span>D:N:M</span>
         </a>
-        <span class="privacy-label"><span class="privacy-dot"></span> Chat y fotos en tu teléfono</span>
+        <span class="privacy-label"><span class="privacy-dot"></span> Chat privado sin conexión</span>
       </header>
 
       <main class="main">
@@ -27,7 +27,7 @@
           <div class="eyebrow"><span class="sparkle">✳</span> TU ESPACIO, TU IA</div>
           <h1 id="title">Hola.<br />Estoy aquí <span>para ti.</span></h1>
           <p class="intro-copy">
-            Tu propia IA D:N:M: conversa contigo y entiende tus fotos en tu teléfono.
+            Tu propia IA D:N:M: chatea contigo sin conexión y ocupa menos espacio.
           </p>
           <a
             class="app-download-button"
@@ -38,7 +38,7 @@
             </svg>
             Descargar aplicación para Android
           </a>
-          <p class="app-download-note">Un solo APK. La primera vez descarga la IA (unos 5,1 GB); Android comprueba actualizaciones a diario.</p>
+          <p class="app-download-note">Un solo APK. La IA descargada ocupa unos 700 MB; Android comprueba actualizaciones a diario.</p>
         </section>
 
         <section class="setup-card" aria-label="Estado de la inteligencia artificial">
@@ -47,13 +47,13 @@
             <div class="setup-copy">
               <strong id="status-title">Tu IA necesita prepararse</strong>
               <p id="status-detail">
-                Descarga una vez el modelo local para chatear y preguntar sobre fotos sin conexión.
+                Descarga una vez el modelo ligero local para chatear sin conexión.
               </p>
             </div>
           </div>
           <progress id="download-progress" max="100" value="0" hidden></progress>
           <div class="setup-bottom">
-            <span id="download-status">Descarga: unos 5,1 GB. Necesita un teléfono compatible.</span>
+            <span id="download-status">Descarga: unos 700 MB.</span>
             <button id="setup-button" class="primary-button" type="button">Preparar mi IA</button>
           </div>
         </section>
@@ -66,36 +66,7 @@
               <span>Puedes preguntarme lo que quieras.</span>
             </div>
           </div>
-          <div id="attachment-list" class="attachment-list" aria-live="polite" hidden></div>
           <form id="chat-form" class="composer">
-            <label class="visually-hidden" for="file-input">Elegir una foto</label>
-            <input
-              id="file-input"
-              class="visually-hidden"
-              type="file"
-              accept="image/*"
-            />
-            <label class="visually-hidden" for="camera-input">Hacer una foto</label>
-            <input
-              id="camera-input"
-              class="visually-hidden"
-              type="file"
-              accept="image/*"
-              capture="environment"
-            />
-            <button id="camera-button" class="attach-button" type="button" aria-label="Hacer una foto" title="Hacer una foto">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 7h3l1.5-2h7L17 7h3v12H4z" />
-                <circle cx="12" cy="13" r="3.5" />
-              </svg>
-            </button>
-            <button id="attach-button" class="attach-button" type="button" aria-label="Elegir una foto" title="Elegir una foto">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="3" y="4" width="18" height="16" rx="2" />
-                <circle cx="8.5" cy="9" r="1.5" />
-                <path d="m21 15-5-5L5 20" />
-              </svg>
-            </button>
             <label class="visually-hidden" for="message-input">Escribe un mensaje</label>
             <textarea
               id="message-input"
@@ -118,12 +89,12 @@
               </svg>
             </button>
           </form>
-          <p class="chat-note">Tus mensajes y fotos se procesan en el teléfono. El dictado sin conexión está disponible en la app Android si tu teléfono tiene instalado el reconocimiento de voz en español.</p>
+          <p class="chat-note">Los mensajes se procesan en el teléfono. El dictado sin conexión está disponible en la app Android si tu teléfono tiene instalado el reconocimiento de voz en español.</p>
         </section>
 
         <footer class="footer-note">
           <span class="lock-icon" aria-hidden="true">⌑</span>
-          <span>Tus mensajes y fotos se quedan en tu teléfono. El modelo se descarga una vez.</span>
+          <span>Los mensajes se quedan en tu teléfono. El modelo ligero se descarga una sola vez.</span>
         </footer>
       </main>
     </div>

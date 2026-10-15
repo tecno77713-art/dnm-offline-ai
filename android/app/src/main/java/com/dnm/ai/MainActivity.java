@@ -23,30 +23,21 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
-import android.provider.MediaStore;
-import androidx.core.content.FileProvider;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.os.Build;
 import android.util.Log;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends Activity {
     private static final String HOME_URL = "https://tecno77713-art.github.io/dnm-offline-ai/?androidApp=1";
-    private static final int FILE_CHOOSER_REQUEST = 1;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 2;
-    private static final int CAMERA_REQUEST = 3;
     private static final int MICROPHONE_PERMISSION_REQUEST = 4;
 
     private WebView webView;
     private ProgressBar progressBar;
-    private android.webkit.ValueCallback<Uri[]> fileChooserCallback;
-    private Uri pendingCameraUri;
-    private File pendingCameraFile;
     private SpeechRecognizer speechRecognizer;
     private TextToSpeech textToSpeech;
     private boolean textToSpeechReady;
@@ -178,32 +169,6 @@ public class MainActivity extends Activity {
                 progressBar.setProgress(newProgress);
                 progressBar.setVisibility(newProgress >= 100 ? ProgressBar.GONE : ProgressBar.VISIBLE);
             }
-
-            @Override
-            public boolean onShowFileChooser(
-                    WebView view,
-                    android.webkit.ValueCallback<Uri[]> callback,
-                    FileChooserParams params
-            ) {
-                if (fileChooserCallback != null) {
-                    fileChooserCallback.onReceiveValue(null);
-                }
-                fileChooserCallback = callback;
-                Intent chooser = params.createIntent();
-                try {
-                    if (params.isCaptureEnabled()) {
-                        openCameraOrFilePicker(chooser);
-                    } else {
-                        startActivityForResult(chooser, FILE_CHOOSER_REQUEST);
-                    }
-                } catch (ActivityNotFoundException exception) {
-                    fileChooserCallback = null;
-                    callback.onReceiveValue(null);
-                    Toast.makeText(MainActivity.this, "No se encontró la cámara ni un selector de fotos.", Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-                return true;
-            }
         });
 
         webView.loadUrl(HOME_URL);
@@ -218,38 +183,6 @@ public class MainActivity extends Activity {
                 && uri.getUserInfo() == null
                 && path != null
                 && ("/dnm-offline-ai".equals(path) || path.startsWith("/dnm-offline-ai/"));
-    }
-
-    private void openCameraOrFilePicker(Intent fallbackPicker) {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(getPackageManager()) == null) {
-            startActivityForResult(fallbackPicker, FILE_CHOOSER_REQUEST);
-            return;
-        }
-
-        try {
-            File cameraDirectory = new File(getCacheDir(), "camera");
-            if (!cameraDirectory.exists() && !cameraDirectory.mkdirs()) {
-                throw new IOException("No se pudo preparar la cámara.");
-            }
-            pendingCameraFile = File.createTempFile("dnm-photo-", ".jpg", cameraDirectory);
-            pendingCameraUri = FileProvider.getUriForFile(
-                    this,
-                    BuildConfig.APPLICATION_ID + ".fileprovider",
-                    pendingCameraFile
-            );
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, pendingCameraUri);
-            cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);
-        } catch (IOException | ActivityNotFoundException exception) {
-            Log.e("DNMCamera", "Could not open the camera.", exception);
-            if (pendingCameraFile != null) {
-                pendingCameraFile.delete();
-            }
-            pendingCameraUri = null;
-            pendingCameraFile = null;
-            startActivityForResult(fallbackPicker, FILE_CHOOSER_REQUEST);
-        }
     }
 
     private void requestNotificationPermission() {
@@ -428,35 +361,6 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_REQUEST) {
-            boolean photoReady = resultCode == RESULT_OK && pendingCameraFile != null && pendingCameraFile.length() > 0;
-            Uri[] results = photoReady
-                    ? new Uri[]{pendingCameraUri}
-                    : null;
-            if (!photoReady && pendingCameraFile != null) {
-                pendingCameraFile.delete();
-            }
-            pendingCameraUri = null;
-            pendingCameraFile = null;
-            if (fileChooserCallback != null) {
-                fileChooserCallback.onReceiveValue(results);
-                fileChooserCallback = null;
-            }
-            return;
-        }
-        if (requestCode != FILE_CHOOSER_REQUEST || fileChooserCallback == null) {
-            return;
-        }
-        Uri[] results = resultCode == RESULT_OK && data != null
-                ? WebChromeClient.FileChooserParams.parseResult(resultCode, data)
-                : null;
-        fileChooserCallback.onReceiveValue(results);
-        fileChooserCallback = null;
-    }
-
-    @Override
     public void onBackPressed() {
         if (webView != null && webView.canGoBack()) {
             webView.goBack();
@@ -467,10 +371,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if (fileChooserCallback != null) {
-            fileChooserCallback.onReceiveValue(null);
-            fileChooserCallback = null;
-        }
         releaseSpeechRecognizer();
         if (textToSpeech != null) {
             textToSpeech.stop();

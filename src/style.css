@@ -289,79 +289,6 @@ h1 span {
   background: var(--paper);
 }
 
-.attachment-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  padding: 10px 14px 0;
-}
-
-.attachment-list[hidden] {
-  display: none;
-}
-
-.attachment-chip {
-  display: flex;
-  max-width: min(100%, 250px);
-  min-height: 34px;
-  align-items: center;
-  gap: 7px;
-  padding: 4px 7px 4px 5px;
-  border: 1px solid #e7e7df;
-  border-radius: 10px;
-  background: #fafaf7;
-}
-
-.attachment-thumbnail,
-.message-image {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  border-radius: 7px;
-  object-fit: cover;
-}
-
-.attachment-file-icon {
-  display: grid;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 7px;
-  background: #f1e9dd;
-  color: #775738;
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.attachment-name {
-  overflow: hidden;
-  color: #54594f;
-  font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.attachment-remove {
-  display: grid;
-  width: 22px;
-  height: 22px;
-  flex: 0 0 auto;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #73776e;
-  cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
-}
-
-.attachment-remove:hover {
-  background: #ecece6;
-}
-
 .messages {
   display: flex;
   min-height: 250px;
@@ -444,33 +371,6 @@ h1 span {
   color: #fff;
 }
 
-.message-attachments {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 7px;
-}
-
-.message-attachment {
-  padding: 5px 8px;
-  border: 1px solid #e8e8df;
-  border-radius: 8px;
-  background: #fafaf7;
-  color: #65695f;
-  font-size: 10px;
-}
-
-.message-image {
-  width: auto;
-  max-width: min(180px, 100%);
-  height: auto;
-  max-height: 150px;
-  margin-top: 7px;
-  border: 1px solid #e8e8df;
-  border-radius: 9px;
-  object-fit: contain;
-}
-
 .composer {
   display: flex;
   align-items: flex-end;
@@ -482,7 +382,7 @@ h1 span {
   background: white;
 }
 
-.attach-button {
+.voice-button {
   display: grid;
   width: 33px;
   height: 33px;
@@ -492,17 +392,13 @@ h1 span {
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: #687164;
+  color: #526b4e;
   cursor: pointer;
 }
 
-.attach-button:disabled {
+.voice-button:disabled {
   cursor: not-allowed;
   color: #b5b8ae;
-}
-
-.voice-button {
-  color: #526b4e;
 }
 
 .speak-button {
@@ -526,7 +422,7 @@ h1 span {
   opacity: 0.5;
 }
 
-.attach-button svg {
+.voice-button svg {
   width: 20px;
   height: 20px;
   fill: none;
@@ -676,7 +572,7 @@ h1 span {
     padding-left: 5px;
   }
 
-  .attach-button,
+  .voice-button,
   .send-button {
     width: 30px;
     height: 32px;

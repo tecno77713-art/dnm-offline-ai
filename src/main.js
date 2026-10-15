@@ -1,11 +1,13 @@
-import { CreateMLCEngine, deleteModelAllInfoInCache, hasModelInCache } from "@mlc-ai/web-llm";
+import {
+  CreateMLCEngine,
+  deleteModelAllInfoInCache
+} from "@mlc-ai/web-llm";
 import "./style.css";
 
-const MODEL_ID = "Phi-3.5-vision-instruct-q4f16_1-MLC";
-const PREVIOUS_MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+const MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+const PREVIOUS_VISION_MODEL_ID = "Phi-3.5-vision-instruct-q4f16_1-MLC";
 const SYSTEM_PROMPT =
-  "Eres D:N:M, una asistente amable y útil. Responde siempre en español, con claridad y honestidad. Puedes analizar las imágenes que adjunta la persona. Si no sabes algo, dilo.";
-const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
+  "Eres D:N:M, una asistente amable y útil. Responde siempre en español, con claridad y honestidad. Si no sabes algo, dilo.";
 
 const statusTitle = document.querySelector("#status-title");
 const statusDetail = document.querySelector("#status-detail");
@@ -13,21 +15,14 @@ const downloadStatus = document.querySelector("#download-status");
 const progress = document.querySelector("#download-progress");
 const setupButton = document.querySelector("#setup-button");
 const messagesElement = document.querySelector("#messages");
-const attachmentList = document.querySelector("#attachment-list");
 const form = document.querySelector("#chat-form");
 const input = document.querySelector("#message-input");
-const fileInput = document.querySelector("#file-input");
-const cameraInput = document.querySelector("#camera-input");
-const attachButton = document.querySelector("#attach-button");
-const cameraButton = document.querySelector("#camera-button");
 const voiceButton = document.querySelector("#voice-button");
 const sendButton = document.querySelector("#send-button");
 
 let engine;
 let messages = [{ role: "system", content: SYSTEM_PROMPT }];
-let pendingImage = null;
 let isGenerating = false;
-let isPreparingFiles = false;
 let activeRecognition = false;
 
 function setStatus(title, detail, download = "") {
@@ -38,12 +33,8 @@ function setStatus(title, detail, download = "") {
 
 function setChatEnabled(enabled) {
   input.disabled = !enabled || isGenerating;
-  fileInput.disabled = isGenerating || isPreparingFiles;
-  cameraInput.disabled = isGenerating || isPreparingFiles;
-  attachButton.disabled = isGenerating || isPreparingFiles;
-  cameraButton.disabled = isGenerating || isPreparingFiles;
   voiceButton.disabled = isGenerating || activeRecognition || !window.DNMAndroid;
-  sendButton.disabled = isGenerating || isPreparingFiles || !enabled;
+  sendButton.disabled = isGenerating || !enabled;
 }
 
 function speak(text) {
@@ -74,7 +65,7 @@ function speak(text) {
   speechSynthesis.speak(utterance);
 }
 
-function addMessage(role, content, image = null) {
+function addMessage(role, content) {
   messagesElement.querySelector(".welcome-message")?.remove();
 
   const article = document.createElement("article");
@@ -88,14 +79,6 @@ function addMessage(role, content, image = null) {
   body.className = "message-content";
   body.textContent = typeof content === "string" ? content : "";
   article.append(label, body);
-
-  if (image) {
-    const thumbnail = document.createElement("img");
-    thumbnail.className = "message-image";
-    thumbnail.src = image.dataUrl;
-    thumbnail.alt = image.name;
-    article.append(thumbnail);
-  }
 
   if (role === "assistant") {
     const speakButton = document.createElement("button");
@@ -113,91 +96,13 @@ function addMessage(role, content, image = null) {
   return body;
 }
 
-function renderPendingImage() {
-  attachmentList.replaceChildren();
-  attachmentList.hidden = !pendingImage;
-  if (!pendingImage) return;
-
-  const chip = document.createElement("div");
-  chip.className = "attachment-chip";
-
-  const thumbnail = document.createElement("img");
-  thumbnail.className = "attachment-thumbnail";
-  thumbnail.src = pendingImage.dataUrl;
-  thumbnail.alt = "";
-
-  const name = document.createElement("span");
-  name.className = "attachment-name";
-  name.textContent = pendingImage.name;
-  name.title = pendingImage.name;
-
-  const removeButton = document.createElement("button");
-  removeButton.className = "attachment-remove";
-  removeButton.type = "button";
-  removeButton.setAttribute("aria-label", `Quitar ${pendingImage.name}`);
-  removeButton.textContent = "×";
-  removeButton.addEventListener("click", () => {
-    pendingImage = null;
-    renderPendingImage();
-  });
-
-  chip.append(thumbnail, name, removeButton);
-  attachmentList.append(chip);
-}
-
-async function resizeImage(file) {
-  const bitmap = await createImageBitmap(file);
-  try {
-    const scale = Math.min(1, 1024 / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("No se pudo preparar la imagen.");
-    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.82);
-  } finally {
-    bitmap.close();
-  }
-}
-
-async function addImage(fileList) {
-  const file = Array.from(fileList)[0];
-  if (!file) return;
-
-  isPreparingFiles = true;
-  setChatEnabled(Boolean(engine));
-  try {
-    if (!file.type.startsWith("image/")) {
-      throw new Error("Elige una imagen de la galería o usa la cámara.");
-    }
-    if (file.size > MAX_IMAGE_BYTES) {
-      throw new Error("La imagen debe ocupar menos de 20 MB.");
-    }
-    pendingImage = {
-      name: file.name || "Foto",
-      dataUrl: await resizeImage(file)
-    };
-    renderPendingImage();
-    setStatus("Foto lista", "La imagen se analizará en este teléfono; no se enviará a internet.");
-  } catch (error) {
-    console.error("No se pudo preparar la imagen:", error);
-    setStatus("No se pudo añadir la foto", error instanceof Error ? error.message : "Comprueba la imagen e inténtalo de nuevo.");
-  } finally {
-    isPreparingFiles = false;
-    fileInput.value = "";
-    cameraInput.value = "";
-    setChatEnabled(Boolean(engine));
-  }
-}
-
 async function prepareModel() {
   if (engine || setupButton.disabled) return;
   if (!navigator.gpu) {
     setStatus(
       "Este navegador no puede ejecutar la IA local",
       "Prueba una versión reciente de Chrome Android en un teléfono compatible con WebGPU.",
-      "El modelo necesita alrededor de 4,5 GB de memoria gráfica."
+      "El modelo ligero ocupa unos 700 MB."
     );
     return;
   }
@@ -207,15 +112,18 @@ async function prepareModel() {
   progress.hidden = false;
   progress.removeAttribute("value");
   setStatus(
-    "Preparando la IA local",
-    "Preparando el espacio y descargando el modelo local de texto y visión.",
-    "La primera descarga ocupa unos 5,1 GB."
+    "Liberando espacio",
+    "Quitando el modelo grande de fotos de la caché para dejar solo el modelo ligero.",
+    "El modelo local nuevo ocupa unos 700 MB."
   );
 
   try {
-    if (await hasModelInCache(PREVIOUS_MODEL_ID)) {
-      await deleteModelAllInfoInCache(PREVIOUS_MODEL_ID);
-    }
+    await deleteModelAllInfoInCache(PREVIOUS_VISION_MODEL_ID);
+    setStatus(
+      "Preparando la IA local",
+      "Descargando y guardando el modelo ligero de chat en este teléfono.",
+      "La primera descarga ocupa unos 700 MB."
+    );
     engine = await CreateMLCEngine(MODEL_ID, {
       initProgressCallback: ({ text, progress: fraction }) => {
         setStatus(
@@ -237,8 +145,8 @@ async function prepareModel() {
     input.focus();
     setStatus(
       "D:N:M está lista",
-      "El chat y el análisis de fotos funcionan localmente en este teléfono. No se envían tus mensajes ni imágenes.",
-      "IA local · no necesita internet después de la descarga."
+      "El chat de texto funciona localmente. No se envían tus mensajes a internet.",
+      "IA local · unos 700 MB · sin conexión."
     );
   } catch (error) {
     console.error("No se pudo preparar el modelo local:", error);
@@ -248,37 +156,25 @@ async function prepareModel() {
     setStatus(
       "No se pudo preparar la IA",
       error instanceof Error ? error.message : "Comprueba la conexión, el espacio libre y la memoria gráfica.",
-      "La primera descarga necesita internet y unos 5,1 GB de espacio."
+      "La descarga inicial ocupa unos 700 MB."
     );
   }
 }
 
-function imageContent(text, image) {
-  if (!image) return text;
-  return [
-    { type: "text", text },
-    { type: "image_url", image_url: { url: image.dataUrl, detail: "high" } }
-  ];
-}
-
 async function sendMessage(event) {
   event.preventDefault();
-  const typedText = input.value.trim();
-  const image = pendingImage;
-  const text = typedText || (image ? "Describe esta imagen y cuéntame qué es lo más importante." : "");
+  const text = input.value.trim();
   if (!text || !engine || isGenerating) return;
 
   isGenerating = true;
   setChatEnabled(true);
-  pendingImage = null;
-  renderPendingImage();
-  addMessage("user", text, image);
+  addMessage("user", text);
   const responseBody = addMessage("assistant", "");
   const speakButton = responseBody.parentElement.querySelector(".speak-button");
   input.value = "";
   const previousMessages = messages;
-  messages = [...messages, { role: "user", content: imageContent(text, image) }];
-  setStatus("D:N:M está pensando", "Tu mensaje y la imagen se procesan en este teléfono.");
+  messages = [...messages, { role: "user", content: text }];
+  setStatus("D:N:M está pensando", "Tu mensaje se procesa localmente en este teléfono.");
 
   try {
     const stream = await engine.chat.completions.create({
@@ -298,15 +194,13 @@ async function sendMessage(event) {
     speakButton.disabled = false;
     setStatus(
       "D:N:M está lista",
-      "La respuesta se generó en este teléfono. Tus mensajes y fotos no se enviaron a ningún servicio.",
+      "La respuesta se generó en este teléfono y no se envió a ningún servicio.",
       "Procesado localmente."
     );
   } catch (error) {
     console.error("Falló la generación local:", error);
     messages = previousMessages;
-    pendingImage = image;
-    renderPendingImage();
-    input.value = typedText;
+    input.value = text;
     responseBody.textContent = "No pude generar una respuesta. Revisa el teléfono e inténtalo de nuevo.";
     setStatus("Ocurrió un error", error instanceof Error ? error.message : "Prueba de nuevo.");
   } finally {
@@ -343,10 +237,6 @@ window.DNMNativeSpeechFinished = () => {
 
 setupButton.addEventListener("click", prepareModel);
 form.addEventListener("submit", sendMessage);
-attachButton.addEventListener("click", () => fileInput.click());
-cameraButton.addEventListener("click", () => cameraInput.click());
-fileInput.addEventListener("change", (event) => addImage(event.currentTarget.files));
-cameraInput.addEventListener("change", (event) => addImage(event.currentTarget.files));
 voiceButton.addEventListener("click", () => {
   if (!window.DNMAndroid || activeRecognition) return;
   activeRecognition = true;
@@ -370,8 +260,8 @@ if (new URLSearchParams(window.location.search).get("androidApp") === "1") {
   } else {
     setStatus(
       "Conéctate a internet para preparar la IA",
-      "La aplicación descargará el modelo local cuando tengas conexión.",
-      "Necesita unos 5,1 GB de descarga y espacio libre."
+      "La aplicación descargará el modelo ligero cuando tengas conexión.",
+      "La descarga ocupa unos 700 MB."
     );
   }
 }

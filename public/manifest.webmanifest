@@ -1,7 +1,7 @@
 {
   "name": "D:N:M · IA sin conexión",
   "short_name": "D:N:M",
-  "description": "Chat local sin conexión y análisis privado de fotos.",
+  "description": "Chat privado y ligero de inteligencia artificial, sin conexión.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",

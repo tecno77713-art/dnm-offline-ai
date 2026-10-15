@@ -32,6 +32,7 @@ textarea {
 }
 
 button:focus-visible,
+a:focus-visible,
 textarea:focus-visible {
   outline: 3px solid #a9c5a4;
   outline-offset: 3px;
@@ -136,6 +137,44 @@ h1 span {
   color: var(--muted);
   font-size: 14px;
   line-height: 1.7;
+}
+
+.app-download-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  padding: 0 15px;
+  border-radius: 11px;
+  background: var(--green);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.app-download-button:hover {
+  transform: translateY(-1px);
+  background: var(--green-dark);
+}
+
+.app-download-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.app-download-note {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .setup-card {
